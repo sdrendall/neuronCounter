@@ -94,11 +94,19 @@ function saveDisplayedImage_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --- Executes on button press in loadImages.
 function loadImages_Callback(hObject, eventdata, handles)
+%% --- Executes on button press in loadImages.
+%
 % hObject    handle to loadImages (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+global images
+% Load images -- Function is recursive by default
+images = searchForImages(startPath, filetype);
+
+% Display first image
+displayFirstImage()
 
 
 % --- Executes on button press in markNeurons.
@@ -133,3 +141,25 @@ function toggleBlue_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of toggleBlue
+
+
+
+function displayFirstImage(handles)
+%% Displays the first image in the images struct
+global images
+
+im = imread(images(1).path)
+% Turn off layers not wanted by the user
+im = checkChannelsToDisplay(im)
+displayOnMain(im, handles)
+
+
+function im = checkChannelsToDisplay(im)
+%% Filters layers
+    return
+
+
+function displayOnMain(im, handles)
+%% Displays image 'im' on the main window
+axes(handles.mainWindow)
+imshow(im)
