@@ -46,105 +46,107 @@ end
 
 % --- Executes just before neuronCounter is made visible.
 function neuronCounter_OpeningFcn(hObject, eventdata, handles, varargin)
-% This function has no output args, see OutputFcn.
-% hObject    handle to figure
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to neuronCounter (see VARARGIN)
-
-% Choose default command line output for neuronCounter
-handles.output = hObject;
-
-% Update handles structure
-guidata(hObject, handles);
-
-% UIWAIT makes neuronCounter wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+    % This function has no output args, see OutputFcn.
+    % hObject    handle to figure
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
+    % varargin   command line arguments to neuronCounter (see VARARGIN)
+    
+    % Choose default command line output for neuronCounter
+    handles.output = hObject;
+    
+    % Update handles structure
+    guidata(hObject, handles);
+    
+    % UIWAIT makes neuronCounter wait for user response (see UIRESUME)
+    % uiwait(handles.figure1);
 
 
 % --- Outputs from this function are returned to the command line.
 function varargout = neuronCounter_OutputFcn(hObject, eventdata, handles) 
-% varargout  cell array for returning output args (see VARARGOUT);
-% hObject    handle to figure
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Get default command line output from handles structure
-varargout{1} = handles.output;
+    % varargout  cell array for returning output args (see VARARGOUT);
+    % hObject    handle to figure
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
+    
+    % Get default command line output from handles structure
+    varargout{1} = handles.output;
 
 
 % --- Executes on button press in previousImage.
 function previousImage_Callback(hObject, eventdata, handles)
-% hObject    handle to previousImage (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-displayPreviousImage(handles)
-
-
+    % hObject    handle to previousImage (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
+    displayPreviousImage(handles)
+    
+    
 % --- Executes on button press in nextImage.
 function nextImage_Callback(hObject, eventdata, handles)
-% hObject    handle to nextImage (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-displayNextImage(handles)
-
-
+    % hObject    handle to nextImage (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
+    displayNextImage(handles)
+    
+    
 % --- Executes on button press in saveDisplayedImage.
 function saveDisplayedImage_Callback(hObject, eventdata, handles)
-% hObject    handle to saveDisplayedImage (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-[filename, path] = uiputfile('*.png', 'Save as...');
-export_fig(handles.mainWindow, fullfile(path, filename))
-
+    % hObject    handle to saveDisplayedImage (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
+    [filename, path] = uiputfile('*.png', 'Save as...');
+    export_fig(handles.mainWindow, fullfile(path, filename))
+    
 
 function loadImages_Callback(hObject, eventdata, handles)
-%% --- Executes on button press in loadImages.
-%
-% hObject    handle to loadImages (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-global images
-% Load images -- Function is recursive by default
-images = searchForImages(startPath, filetype);
-
-% Display first image
-displayFirstImage(handles);
+    %% --- Executes on button press in loadImages.
+    %
+    % hObject    handle to loadImages (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
+    
+    global images
+    % Load images -- Function is recursive by default
+    images = searchForImages();
+    
+    % Display first image
+    displayFirstImage(handles);
 
 
 % --- Executes on button press in markNeurons.
 function markNeurons_Callback(hObject, eventdata, handles)
-% hObject    handle to markNeurons (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+    % hObject    handle to markNeurons (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
 
 
 % --- Executes on button press in toggleGreen.
 function toggleGreen_Callback(hObject, eventdata, handles)
-% hObject    handle to toggleGreen (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of toggleGreen
-
+    % hObject    handle to toggleGreen (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
+    
+    % Hint: get(hObject,'Value') returns toggle state of toggleGreen
+    refreshMainWindow(handles);
 
 % --- Executes on button press in toggleRed.
 function toggleRed_Callback(hObject, eventdata, handles)
-% hObject    handle to toggleRed (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of toggleRed
-
+    % hObject    handle to toggleRed (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
+    
+    % Hint: get(hObject,'Value') returns toggle state of toggleRed
+    refreshMainWindow(handles);
 
 % --- Executes on button press in toggleBlue.
 function toggleBlue_Callback(hObject, eventdata, handles)
-% hObject    handle to toggleBlue (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+    % hObject    handle to toggleBlue (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
+    
+    % Hint: get(hObject,'Value') returns toggle state of toggleBlue
+    refreshMainWindow(handles);
 
-% Hint: get(hObject,'Value') returns toggle state of toggleBlue
 
 function displayNextImage(handles)
     %% Displays the next image, wraps around if the last image is being displayed
@@ -159,6 +161,7 @@ function displayNextImage(handles)
     currIm = imread(images(currImInd).path);
     refreshMainWindow(handles)
 
+
 function displayPreviousImage(handles)
     %% Loads the previous image in images then refreshes the main window
     global images currImInd currIm
@@ -172,27 +175,42 @@ function displayPreviousImage(handles)
     currIm = imread(images(currImInd).path);
     refreshMainWindow(handles)
 
+
 function displayFirstImage(handles)
     %% Displays the first image in the images struct
-    global images currImInd currIm
+    global currIm currImInd images
     currImInd = 1;
+    currIm = imread(images(currImInd).path);
     refreshMainWindow(handles)
+
 
 function refreshMainWindow(handles)
     %% Resets the main window to display images(currImInd)
     % Load im
-    currIm = checkChannelsToDisplay(currIm, handles)
-    displayOnMain(currIm, handles)
+    dispIm = checkChannelsToDisplay(currIm, handles)
+    displayOnMain(dispIm, handles)
 
-function im = checkChannelsToDisplay(im, h)
-    %% Filters layers
-    redOn = get(h.toggleRed, 'Value');
-    blueOn = get(h.toggleBlue, 'Value');
-    greenOn = get(h.toggleGreen, 'Value');
+
+function imOut = checkChannelsToDisplay(imIn, h)
+    %% Filters and rearranges layers based on user input
+    % Returns a new, filtered image
+    redChannel = 1;
+    blueChannel = 2;
+    greenChannel = 3;
     
+    channels = [redChannel, blueChannel, greenChannel];
+
+    channelOn(redChannel) = get(h.toggleRed, 'Value');
+    channelOn(blueChannel) = get(h.toggleBlue, 'Value');
+    channelOn(greenChannel) = get(h.toggleGreen, 'Value');
+    
+    imOut = zeros(size(imIn));
+    for iCh = 1:3
+        imOut(:,:,channels(iCh)) = channelOn(iCh)*imIn(:,:,iCh);
+    end
 
 
-    function displayOnMain(im, handles)
+function displayOnMain(im, handles)
     %% Displays image 'im' on the main window
     axes(handles.mainWindow)
     imshow(im)
