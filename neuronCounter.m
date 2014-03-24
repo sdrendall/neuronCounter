@@ -78,6 +78,7 @@ function previousImage_Callback(hObject, eventdata, handles)
 % hObject    handle to previousImage (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+displayPreviousImage(handles)
 
 
 % --- Executes on button press in nextImage.
@@ -85,6 +86,7 @@ function nextImage_Callback(hObject, eventdata, handles)
 % hObject    handle to nextImage (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+displayNextImage(handles)
 
 
 % --- Executes on button press in saveDisplayedImage.
@@ -92,6 +94,8 @@ function saveDisplayedImage_Callback(hObject, eventdata, handles)
 % hObject    handle to saveDisplayedImage (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+[filename, path] = uiputfile('*.png', 'Save as...');
+export_fig(handles.mainWindow, fullfile(path, filename))
 
 
 function loadImages_Callback(hObject, eventdata, handles)
@@ -106,7 +110,7 @@ global images
 images = searchForImages(startPath, filetype);
 
 % Display first image
-displayFirstImage()
+displayFirstImage(handles);
 
 
 % --- Executes on button press in markNeurons.
@@ -142,24 +146,53 @@ function toggleBlue_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of toggleBlue
 
+function displayNextImage(handles)
+    %% Displays the next image, wraps around if the last image is being displayed
+    global images currImInd currIm
 
+    if currImInd >= size(images, 1)
+        currImInd = 1;
+    else
+        currImInd = currImInd + 1;
+    end
+
+    currIm = imread(images(currImInd).path);
+    refreshMainWindow(handles)
+
+function displayPreviousImage(handles)
+    %% Loads the previous image in images then refreshes the main window
+    global images currImInd currIm
+
+    if currImInd <= 1
+        currImInd = size(images, 1);
+    else
+        currImInd = currImInd - 1;
+    end
+
+    currIm = imread(images(currImInd).path);
+    refreshMainWindow(handles)
 
 function displayFirstImage(handles)
-%% Displays the first image in the images struct
-global images
+    %% Displays the first image in the images struct
+    global images currImInd currIm
+    currImInd = 1;
+    refreshMainWindow(handles)
 
-im = imread(images(1).path)
-% Turn off layers not wanted by the user
-im = checkChannelsToDisplay(im)
-displayOnMain(im, handles)
+function refreshMainWindow(handles)
+    %% Resets the main window to display images(currImInd)
+    % Load im
+    currIm = checkChannelsToDisplay(currIm, handles)
+    displayOnMain(currIm, handles)
+
+function im = checkChannelsToDisplay(im, h)
+    %% Filters layers
+    redOn = get(h.toggleRed, 'Value');
+    blueOn = get(h.toggleBlue, 'Value');
+    greenOn = get(h.toggleGreen, 'Value');
+    
 
 
-function im = checkChannelsToDisplay(im)
-%% Filters layers
-    return
-
-
-function displayOnMain(im, handles)
-%% Displays image 'im' on the main window
-axes(handles.mainWindow)
-imshow(im)
+    function displayOnMain(im, handles)
+    %% Displays image 'im' on the main window
+    axes(handles.mainWindow)
+    imshow(im)
