@@ -127,7 +127,7 @@ function toggleGreen_Callback(hObject, eventdata, handles)
     % handles    structure with handles and user data (see GUIDATA)
     
     % Hint: get(hObject,'Value') returns toggle state of toggleGreen
-    refreshMainWindow(handles);
+    refreshMainDisplay(handles);
 
 % --- Executes on button press in toggleRed.
 function toggleRed_Callback(hObject, eventdata, handles)
@@ -136,7 +136,7 @@ function toggleRed_Callback(hObject, eventdata, handles)
     % handles    structure with handles and user data (see GUIDATA)
     
     % Hint: get(hObject,'Value') returns toggle state of toggleRed
-    refreshMainWindow(handles);
+    refreshMainDisplay(handles);
 
 % --- Executes on button press in toggleBlue.
 function toggleBlue_Callback(hObject, eventdata, handles)
@@ -145,7 +145,7 @@ function toggleBlue_Callback(hObject, eventdata, handles)
     % handles    structure with handles and user data (see GUIDATA)
     
     % Hint: get(hObject,'Value') returns toggle state of toggleBlue
-    refreshMainWindow(handles);
+    refreshMainDisplay(handles);
 
 
 function displayNextImage(handles)
@@ -158,12 +158,12 @@ function displayNextImage(handles)
         currImInd = currImInd + 1;
     end
 
-    currIm = imread(images(currImInd).path);
-    refreshMainWindow(handles)
+    setCurrIm(images(currImInd).path)
+    refreshMainDisplay(handles)
 
 
 function displayPreviousImage(handles)
-    %% Loads the previous image in images then refreshes the main window
+    %% Loads the previous image in images then refreshes the main display
     global images currImInd currIm
 
     if currImInd <= 1
@@ -172,22 +172,27 @@ function displayPreviousImage(handles)
         currImInd = currImInd - 1;
     end
 
-    currIm = imread(images(currImInd).path);
-    refreshMainWindow(handles)
+    setCurrIm(images(currImInd).path)
+    refreshMainDisplay(handles)
 
 
 function displayFirstImage(handles)
     %% Displays the first image in the images struct
     global currIm currImInd images
     currImInd = 1;
-    currIm = imread(images(currImInd).path);
-    refreshMainWindow(handles)
+    setCurrIm(images(currImInd).path)
+    refreshMainDisplay(handles)
 
+function setCurrIm(imPath)
+    global currIm
+    currIm = mat2gray(imread(imPath));
 
-function refreshMainWindow(handles)
-    %% Resets the main window to display images(currImInd)
+function refreshMainDisplay(handles)
+    %% Resets the main display to display images(currImInd)
     % Load im
-    dispIm = checkChannelsToDisplay(currIm, handles)
+    global currIm
+
+    dispIm = checkChannelsToDisplay(currIm, handles);
     displayOnMain(dispIm, handles)
 
 
@@ -195,14 +200,14 @@ function imOut = checkChannelsToDisplay(imIn, h)
     %% Filters and rearranges layers based on user input
     % Returns a new, filtered image
     redChannel = 1;
-    blueChannel = 2;
-    greenChannel = 3;
+    greenChannel = 2;
+    blueChannel = 3;
     
-    channels = [redChannel, blueChannel, greenChannel];
+    channels = [redChannel, greenChannel, blueChannel];
 
-    channelOn(redChannel) = get(h.toggleRed, 'Value');
-    channelOn(blueChannel) = get(h.toggleBlue, 'Value');
-    channelOn(greenChannel) = get(h.toggleGreen, 'Value');
+    channelOn(redChannel) = get(h.toggleRed, 'Value')
+    channelOn(blueChannel) = get(h.toggleBlue, 'Value')
+    channelOn(greenChannel) = get(h.toggleGreen, 'Value')
     
     imOut = zeros(size(imIn));
     for iCh = 1:3
@@ -211,6 +216,6 @@ function imOut = checkChannelsToDisplay(imIn, h)
 
 
 function displayOnMain(im, handles)
-    %% Displays image 'im' on the main window
-    axes(handles.mainWindow)
+    %% Displays image 'im' on the main display
+    axes(handles.mainDisplay)
     imshow(im)
