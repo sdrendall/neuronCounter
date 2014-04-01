@@ -22,7 +22,7 @@ function varargout = neuronCounter(varargin)
 
 % Edit the above text to modify the response to help neuronCounter
 
-% Last Modified by GUIDE v2.5 21-Mar-2014 11:09:21
+% Last Modified by GUIDE v2.5 01-Apr-2014 13:00:55
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -95,7 +95,7 @@ function saveDisplayedImage_Callback(hObject, eventdata, handles)
     % eventdata  reserved - to be defined in a future version of MATLAB
     % handles    structure with handles and user data (see GUIDATA)
     [filename, path] = uiputfile('*.png', 'Save as...');
-    export_fig(handles.mainWindow, fullfile(path, filename))
+    export_fig(handles.mainDisplay, fullfile(path, filename))
     
 
 function loadImages_Callback(hObject, eventdata, handles)
@@ -118,7 +118,20 @@ function markNeurons_Callback(hObject, eventdata, handles)
     % hObject    handle to markNeurons (see GCBO)
     % eventdata  reserved - to be defined in a future version of MATLAB
     % handles    structure with handles and user data (see GUIDATA)
+    manipulateNeuronLabels(handles);
+    currIm.neurons.Count
 
+
+% --- Executes on button press in findNeurons.
+function findNeurons_Callback(hObject, eventdata, handles)
+    % hObject    handle to findNeurons (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
+    global currIm
+    [currIm.labIm, currIm.neurons] = findNeuronsAlgorithm(currIm.image);
+
+    refreshMainDisplay(handles);
+    currIm.neurons.Count
 
 % --- Executes on button press in toggleGreen.
 function toggleGreen_Callback(hObject, eventdata, handles)
@@ -129,6 +142,7 @@ function toggleGreen_Callback(hObject, eventdata, handles)
     % Hint: get(hObject,'Value') returns toggle state of toggleGreen
     refreshMainDisplay(handles);
 
+
 % --- Executes on button press in toggleRed.
 function toggleRed_Callback(hObject, eventdata, handles)
     % hObject    handle to toggleRed (see GCBO)
@@ -137,6 +151,7 @@ function toggleRed_Callback(hObject, eventdata, handles)
     
     % Hint: get(hObject,'Value') returns toggle state of toggleRed
     refreshMainDisplay(handles);
+
 
 % --- Executes on button press in toggleBlue.
 function toggleBlue_Callback(hObject, eventdata, handles)
@@ -183,17 +198,30 @@ function displayFirstImage(handles)
     setCurrIm(images(currImInd).path)
     refreshMainDisplay(handles)
 
+
 function setCurrIm(imPath)
     global currIm
-    currIm = mat2gray(imread(imPath));
+    currIm.image = mat2gray(imread(imPath));
+    currIm.labIm = [];
+
 
 function refreshMainDisplay(handles)
     %% Resets the main display to display images(currImInd)
     % Load im
     global currIm
 
-    dispIm = checkChannelsToDisplay(currIm, handles);
+    dispIm = checkChannelsToDisplay(currIm.image, handles);
     displayOnMain(dispIm, handles)
+
+    if currImHasLabIm()
+        overlayOnMain(im2bw(currIm.labIm, 0), handles)
+    end
+
+
+function result = currImHasLabIm()
+    %% Checks if the currIm has a neuron labIm
+    global currIm
+    result = any(strcmp('labIm', fieldnames(currIm))) && ~isempty(currIm.labIm);
 
 
 function imOut = checkChannelsToDisplay(imIn, h)
@@ -205,9 +233,9 @@ function imOut = checkChannelsToDisplay(imIn, h)
     
     channels = [redChannel, greenChannel, blueChannel];
 
-    channelOn(redChannel) = get(h.toggleRed, 'Value')
-    channelOn(blueChannel) = get(h.toggleBlue, 'Value')
-    channelOn(greenChannel) = get(h.toggleGreen, 'Value')
+    channelOn(redChannel) = get(h.toggleRed, 'Value');
+    channelOn(blueChannel) = get(h.toggleBlue, 'Value');
+    channelOn(greenChannel) = get(h.toggleGreen, 'Value');
     
     imOut = zeros(size(imIn));
     for iCh = 1:3
@@ -219,3 +247,90 @@ function displayOnMain(im, handles)
     %% Displays image 'im' on the main display
     axes(handles.mainDisplay)
     imshow(im)
+
+
+function overlayOnMain(overlay, handles)
+    %% Overlays an image on the main displays
+    trans = .5;
+    clr = [1 0 0];
+    axes(handles.mainDisplay)
+    alphamask(overlay, clr, trans);
+
+
+%% Image Editing Functions
+function manipulateNeuronLabels(handles)
+    %% Function to allow user manipulation of the neuron mask over currIm
+    global currIm
+
+    % Make there is a neuron mask to work with
+    if ~currImHasLabIm()
+        currIm.labIm = logical(zeros(size(currIm.image)));
+    end
+
+    % Get input
+    inpt = getInputFromMainDisplay(handles);
+
+    % Process input
+    processMainDisplayInput(inpt);
+
+    % Refresh Main Display
+    refreshMainDisplay(handles);
+
+
+function processMainDisplayInput(in)
+    %% Calls removeNeurons and addNeurons accordingly
+
+    coordsToAdd = in.bp == 1;
+    coordsToRemove = in.bp ==3;
+
+    removeNeurons(in.xInds(coordsToRemove), in.yInds(coordsToRemove));
+    addNeurons(in.xInds(coordsToAdd), in.yInds(coordsToAdd));
+
+
+function removeNeurons(xInds, yInds)
+    %% Removes neurons from currIm.neurons and .labIm
+    global currIm
+    for i = 1:length(xInds)
+        nr = yInds(i);
+        nc = xInds(i);
+
+        % nr, nc
+        nKey = currIm.labIm(nr, nc);
+        
+        % remove key, update labIm
+        if currIm.neurons.isKey(nKey)
+            currIm.neurons.remove(nKey);
+            currIm.labIm(currIm.labIm == nKey) = 0;
+        end
+    end
+
+function addNeurons(xInds, yInds)
+    %% Adds neurons to currIm.neurons and .labIm
+    global currIm
+    nRad = 15; % TODO: Make this user defined
+    [X, Y] = meshgrid(1:size(currIm.labIm, 2), 1:size(currIm.labIm, 1));
+
+    for i = 1:length(xInds)
+        x = xInds(i);
+        y = yInds(i);
+
+        newNeuron.Area = pi*nRad^2;
+        newNeuron.Centroid = [x, y];
+        newNeuron.BoundingBox = [[x, y] - nRad, nRad*2, nRad*2];
+
+        nKey = max(currIm.labIm(:)) + 1;
+        currIm.neurons(nKey) = newNeuron;
+
+        % draw a circle on labIm
+        circleInds = nRad^2 >= (X - x).^2 + (Y - y).^2;
+        currIm.labIm(circleInds) = nKey;
+    end
+
+
+function inpt = getInputFromMainDisplay(handles)
+    %% returns a matrix containing the results of ginput on the main window 
+    axes(handles.mainDisplay)
+    [xInds, yInds, buttonPresses] = ginput();
+    inpt.xInds = round(xInds);
+    inpt.yInds = round(yInds);
+    inpt.bp = buttonPresses;
