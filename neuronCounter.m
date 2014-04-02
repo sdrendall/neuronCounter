@@ -1,19 +1,19 @@
 function varargout = neuronCounter(varargin)
-% NEURONCOUNTER MATLAB code for neuronCounter.fig
+%NEURONCOUNTER M-file for neuronCounter.fig
 %      NEURONCOUNTER, by itself, creates a new NEURONCOUNTER or raises the existing
 %      singleton*.
 %
 %      H = NEURONCOUNTER returns the handle to a new NEURONCOUNTER or the handle to
 %      the existing singleton*.
 %
-%      NEURONCOUNTER('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in NEURONCOUNTER.M with the given input arguments.
+%      NEURONCOUNTER('Property','Value',...) creates a new NEURONCOUNTER using the
+%      given property value pairs. Unrecognized properties are passed via
+%      varargin to neuronCounter_OpeningFcn.  This calling syntax produces a
+%      warning when there is an existing singleton*.
 %
-%      NEURONCOUNTER('Property','Value',...) creates a new NEURONCOUNTER or raises the
-%      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before neuronCounter_OpeningFcn gets called.  An
-%      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to neuronCounter_OpeningFcn via varargin.
+%      NEURONCOUNTER('CALLBACK') and NEURONCOUNTER('CALLBACK',hObject,...) call the
+%      local function named CALLBACK in NEURONCOUNTER.M with the given input
+%      arguments.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
@@ -22,7 +22,7 @@ function varargout = neuronCounter(varargin)
 
 % Edit the above text to modify the response to help neuronCounter
 
-% Last Modified by GUIDE v2.5 02-Apr-2014 15:30:22
+% Last Modified by GUIDE v2.5 02-Apr-2014 16:01:25
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -30,10 +30,10 @@ gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
                    'gui_OpeningFcn', @neuronCounter_OpeningFcn, ...
                    'gui_OutputFcn',  @neuronCounter_OutputFcn, ...
-                   'gui_LayoutFcn',  [] , ...
+                   'gui_LayoutFcn',  [], ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
-    gui_State.gui_Callback = str2func(varargin{1});
+   gui_State.gui_Callback = str2func(varargin{1});
 end
 
 if nargout
@@ -50,7 +50,8 @@ function neuronCounter_OpeningFcn(hObject, eventdata, handles, varargin)
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to neuronCounter (see VARARGIN)
+% varargin   unrecognized PropertyName/PropertyValue pairs from the
+%            command line (see VARARGIN)
 
 % Choose default command line output for neuronCounter
 handles.output = hObject;
@@ -63,7 +64,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = neuronCounter_OutputFcn(hObject, eventdata, handles) 
+function varargout = neuronCounter_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -108,31 +109,34 @@ function markNeurons_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --- Executes on button press in toggleGreen.
-function toggleGreen_Callback(hObject, eventdata, handles)
-% hObject    handle to toggleGreen (see GCBO)
+% --- Executes on button press in findNeurons.
+function findNeurons_Callback(hObject, eventdata, handles)
+% hObject    handle to findNeurons (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of toggleGreen
 
 
-% --- Executes on button press in toggleRed.
-function toggleRed_Callback(hObject, eventdata, handles)
-% hObject    handle to toggleRed (see GCBO)
+function imsPerBuff_textBox_Callback(hObject, eventdata, handles)
+% hObject    handle to imsPerBuff_textBox (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of toggleRed
+% Hints: get(hObject,'String') returns contents of imsPerBuff_textBox as text
+%        str2double(get(hObject,'String')) returns contents of imsPerBuff_textBox as a double
 
 
-% --- Executes on button press in toggleBlue.
-function toggleBlue_Callback(hObject, eventdata, handles)
-% hObject    handle to toggleBlue (see GCBO)
+% --- Executes during object creation, after setting all properties.
+function imsPerBuff_textBox_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to imsPerBuff_textBox (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% handles    empty - handles not created until after all CreateFcns called
 
-% Hint: get(hObject,'Value') returns toggle state of toggleBlue
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
 
 
 
@@ -271,8 +275,8 @@ end
 
 
 % --- Executes on slider movement.
-function slider5_Callback(hObject, eventdata, handles)
-% hObject    handle to slider5 (see GCBO)
+function transparency_maskSlider_Callback(hObject, eventdata, handles)
+% hObject    handle to transparency_maskSlider (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -281,8 +285,8 @@ function slider5_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function slider5_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to slider5 (see GCBO)
+function transparency_maskSlider_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to transparency_maskSlider (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -293,18 +297,18 @@ end
 
 
 
-function edit6_Callback(hObject, eventdata, handles)
-% hObject    handle to edit6 (see GCBO)
+function transparency_textBox_Callback(hObject, eventdata, handles)
+% hObject    handle to transparency_textBox (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit6 as text
-%        str2double(get(hObject,'String')) returns contents of edit6 as a double
+% Hints: get(hObject,'String') returns contents of transparency_textBox as text
+%        str2double(get(hObject,'String')) returns contents of transparency_textBox as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function edit6_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit6 (see GCBO)
+function transparency_textBox_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to transparency_textBox (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -315,19 +319,46 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
-function imsPerBuff_textBox_Callback(hObject, eventdata, handles)
-% hObject    handle to imsPerBuff_textBox (see GCBO)
+% --- Executes on button press in toggleGreen.
+function toggleGreen_Callback(hObject, eventdata, handles)
+% hObject    handle to toggleGreen (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of imsPerBuff_textBox as text
-%        str2double(get(hObject,'String')) returns contents of imsPerBuff_textBox as a double
+% Hint: get(hObject,'Value') returns toggle state of toggleGreen
+
+
+% --- Executes on button press in toggleRed.
+function toggleRed_Callback(hObject, eventdata, handles)
+% hObject    handle to toggleRed (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of toggleRed
+
+
+% --- Executes on button press in toggleBlue.
+function toggleBlue_Callback(hObject, eventdata, handles)
+% hObject    handle to toggleBlue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of toggleBlue
+
+
+
+function currImInBuff_textBox_Callback(hObject, eventdata, handles)
+% hObject    handle to currImInBuff_textBox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of currImInBuff_textBox as text
+%        str2double(get(hObject,'String')) returns contents of currImInBuff_textBox as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function imsPerBuff_textBox_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to imsPerBuff_textBox (see GCBO)
+function currImInBuff_textBox_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to currImInBuff_textBox (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -336,3 +367,24 @@ function imsPerBuff_textBox_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in loadNextBuffer.
+function loadNextBuffer_Callback(hObject, eventdata, handles)
+% hObject    handle to loadNextBuffer (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in runStats.
+function runStats_Callback(hObject, eventdata, handles)
+% hObject    handle to runStats (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in exportResults.
+function exportResults_Callback(hObject, eventdata, handles)
+% hObject    handle to exportResults (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
