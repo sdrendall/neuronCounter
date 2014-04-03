@@ -39,11 +39,11 @@ end
 
 %----------------Function Main----------------%
 startPath = fullfile(startPath);
+imageData = [];
 
 % Search current directory
 cdContents = dirNoDot(startPath);
 if length(cdContents) == 0
-    imageData = [];
     return
 end
 

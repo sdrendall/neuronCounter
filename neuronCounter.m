@@ -22,7 +22,7 @@ function varargout = neuronCounter(varargin)
 
 % Edit the above text to modify the response to help neuronCounter
 
-% Last Modified by GUIDE v2.5 01-Apr-2014 13:00:55
+% Last Modified by GUIDE v2.5 03-Apr-2014 18:12:55
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -48,7 +48,8 @@ end
 function neuronCounter_OpeningFcn(hObject, eventdata, handles, varargin)
     % This function has no output args, see OutputFcn.
     % varargin   command line arguments to neuronCounter (see VARARGIN)
-    
+    global imageBuffer 
+
     % Choose default command line output for neuronCounter
     handles.output = hObject;
     
@@ -57,6 +58,8 @@ function neuronCounter_OpeningFcn(hObject, eventdata, handles, varargin)
     
     % UIWAIT makes neuronCounter wait for user response (see UIRESUME)
     % uiwait(handles.figure1);
+
+    imageBuffer = [];
 
 
 % --- Outputs from this function are returned to the command line.
@@ -110,7 +113,7 @@ function markNeurons_Callback(hObject, eventdata, handles)
 function findNeurons_Callback(hObject, eventdata, handles)
     global imageBuffer
 
-    parfor i = 1:length(imageBuffer)
+    for i = 1:length(imageBuffer)
         [imageBuffer(i).labIm, imageBuffer(i).neurons] = findNeuronsAlgorithm(imageBuffer(i).im);
     end
 
@@ -318,7 +321,7 @@ function displayNextImage(handles)
     %% Displays the next image, wraps around if the last image is being displayed
     global currImInd imageBuffer
 
-    if currImInd >= size(imageBuffer, 1)
+    if currImInd >= size(imageBuffer, 2);
         currImInd = 1;
     else
         currImInd = currImInd + 1;
@@ -333,7 +336,7 @@ function displayPreviousImage(handles)
     global currImInd imageBuffer
 
     if currImInd <= 1
-        currImInd = size(imageBuffer, 1);
+        currImInd = size(imageBuffer, 2);
     else
         currImInd = currImInd - 1;
     end
