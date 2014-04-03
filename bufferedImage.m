@@ -10,7 +10,7 @@ classdef bufferedImage < handle
     methods
         function obj = bufferedImage(rootObj);
             obj.dataObj = rootObj;
-            obj.im = double(mat2gray(imread(rootObj.path)));
+            obj.im = mat2gray(imread(rootObj.path));
         end
     end
 end

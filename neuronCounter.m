@@ -155,7 +155,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
 function blue_maskTextBox_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'String') returns contents of blue_maskTextBox as text
 %        str2double(get(hObject,'String')) returns contents of blue_maskTextBox as a double
@@ -168,7 +167,6 @@ function blue_maskTextBox_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 
 function green_maskTextBox_Callback(hObject, eventdata, handles)
@@ -300,7 +298,7 @@ function loadNextBuffer_Callback(hObject, eventdata, handles)
     global bufferInds
 
     % Get index array
-    bufferSize = get(handles.imsPerBuff_textBox, 'Value');
+    bufferSize = get(handles.imsPerBuff_textBox, 'Value')
 
     if bufferSize <= length(bufferInds)
         inds = bufferInds(1:bufferSize);
@@ -312,6 +310,8 @@ function loadNextBuffer_Callback(hObject, eventdata, handles)
 
     % Buffer over indexes
     bufferImages(inds)
+
+    displayFirstImage(handles);
 
 
 function displayNextImage(handles)
@@ -360,22 +360,21 @@ function displayFirstImage(handles)
 function bufferImages(inds)
     %% fills imageBuffer with images from the "images" object array indexed by "inds"
     global imageBuffer images
+    inds
 
-    imageBuffer = [];
+    imageBuffer = []
     for i = 1:length(inds)
-        if isempty(imageBuffer)
-            imageBuffer = bufferedImage(images(inds(i)));
-        else
-            imageBuffer(i) = bufferedImage(images(inds(i)));
-        end
+        imageBuffer = [imageBuffer, bufferedImage(images(inds(i)))];
     end
+
+    disp(imageBuffer)
 
 
 function refreshMainDisplay(handles)
     %% Resets the main display to display images(currImInd)
     % Load im
     global imageBuffer currImInd
-    currImInd
+
     dispIm = checkChannelsToDisplay(imageBuffer(currImInd).im, handles);
     displayOnMain(dispIm, handles)
 
@@ -396,13 +395,14 @@ function imOut = checkChannelsToDisplay(imIn, h)
     redChannel = 1;
     greenChannel = 2;
     blueChannel = 3;
-    
+
     channels = [redChannel, greenChannel, blueChannel];
 
     channelOn(redChannel) = get(h.toggleRed, 'Value');
     channelOn(blueChannel) = get(h.toggleBlue, 'Value');
     channelOn(greenChannel) = get(h.toggleGreen, 'Value');
-    
+
+    imIn = mat2gray(imIn);
     imOut = zeros(size(imIn));
     for iCh = 1:3
         imOut(:,:,channels(iCh)) = channelOn(iCh)*imIn(:,:,iCh);
