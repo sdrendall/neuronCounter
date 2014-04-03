@@ -47,9 +47,6 @@ end
 % --- Executes just before neuronCounter is made visible.
 function neuronCounter_OpeningFcn(hObject, eventdata, handles, varargin)
     % This function has no output args, see OutputFcn.
-    % hObject    handle to figure
-    % eventdata  reserved - to be defined in a future version of MATLAB
-    % handles    structure with handles and user data (see GUIDATA)
     % varargin   command line arguments to neuronCounter (see VARARGIN)
     
     % Choose default command line output for neuronCounter
@@ -65,9 +62,6 @@ function neuronCounter_OpeningFcn(hObject, eventdata, handles, varargin)
 % --- Outputs from this function are returned to the command line.
 function varargout = neuronCounter_OutputFcn(hObject, eventdata, handles) 
     % varargout  cell array for returning output args (see VARARGOUT);
-    % hObject    handle to figure
-    % eventdata  reserved - to be defined in a future version of MATLAB
-    % handles    structure with handles and user data (see GUIDATA)
     
     % Get default command line output from handles structure
     varargout{1} = handles.output;
@@ -75,109 +69,85 @@ function varargout = neuronCounter_OutputFcn(hObject, eventdata, handles)
 
 % --- Executes on button press in previousImage.
 function previousImage_Callback(hObject, eventdata, handles)
-    % hObject    handle to previousImage (see GCBO)
-    % eventdata  reserved - to be defined in a future version of MATLAB
-    % handles    structure with handles and user data (see GUIDATA)
-    displayPreviousImage(handles)
+
+   displayPreviousImage(handles)
     
     
 % --- Executes on button press in nextImage.
 function nextImage_Callback(hObject, eventdata, handles)
-    % hObject    handle to nextImage (see GCBO)
-    % eventdata  reserved - to be defined in a future version of MATLAB
-    % handles    structure with handles and user data (see GUIDATA)
-    displayNextImage(handles)
+
+   displayNextImage(handles)
     
     
 % --- Executes on button press in saveDisplayedImage.
 function saveDisplayedImage_Callback(hObject, eventdata, handles)
-    % hObject    handle to saveDisplayedImage (see GCBO)
-    % eventdata  reserved - to be defined in a future version of MATLAB
-    % handles    structure with handles and user data (see GUIDATA)
-    [filename, path] = uiputfile('*.png', 'Save as...');
+
+   [filename, path] = uiputfile('*.tif', 'Save as...');
     export_fig(handles.mainDisplay, fullfile(path, filename))
     
 
 function loadImages_Callback(hObject, eventdata, handles)
     %% --- Executes on button press in loadImages.
-    %
-    % hObject    handle to loadImages (see GCBO)
-    % eventdata  reserved - to be defined in a future version of MATLAB
-    % handles    structure with handles and user data (see GUIDATA)
-    
-    global images
+    global images bufferInds
+
     % Load images -- Function is recursive by default
-    images = searchForImages();
+    images = searchForFISHImages();
     
+    % Create a random permutation of the indexes to each image to use for buffering
+    bufferInds = randperm(length(images));
+
     % Display first image
     displayFirstImage(handles);
 
 
 % --- Executes on button press in markNeurons.
 function markNeurons_Callback(hObject, eventdata, handles)
-    % hObject    handle to markNeurons (see GCBO)
-    % eventdata  reserved - to be defined in a future version of MATLAB
-    % handles    structure with handles and user data (see GUIDATA)
+    global imageBuffer
     manipulateNeuronLabels(handles);
-    currIm.neurons.Count
 
 
 % --- Executes on button press in findNeurons.
 function findNeurons_Callback(hObject, eventdata, handles)
-    % hObject    handle to findNeurons (see GCBO)
-    % eventdata  reserved - to be defined in a future version of MATLAB
-    % handles    structure with handles and user data (see GUIDATA)
-    global currIm
-    [currIm.labIm, currIm.neurons] = findNeuronsAlgorithm(currIm.image);
+    global imageBuffer
+
+    parfor i = 1:length(imageBuffer)
+        [imageBuffer(i).labIm, imageBuffer(i).neurons] = findNeuronsAlgorithm(imageBuffer(i).im);
+    end
 
     refreshMainDisplay(handles);
-    currIm.neurons.Count
+
 
 % --- Executes on button press in toggleGreen.
 function toggleGreen_Callback(hObject, eventdata, handles)
-    % hObject    handle to toggleGreen (see GCBO)
-    % eventdata  reserved - to be defined in a future version of MATLAB
-    % handles    structure with handles and user data (see GUIDATA)
-    
+
+   
     % Hint: get(hObject,'Value') returns toggle state of toggleGreen
     refreshMainDisplay(handles);
 
 
 % --- Executes on button press in toggleRed.
 function toggleRed_Callback(hObject, eventdata, handles)
-    % hObject    handle to toggleRed (see GCBO)
-    % eventdata  reserved - to be defined in a future version of MATLAB
-    % handles    structure with handles and user data (see GUIDATA)
-    
+
+   
     % Hint: get(hObject,'Value') returns toggle state of toggleRed
     refreshMainDisplay(handles);
 
 
 % --- Executes on button press in toggleBlue.
 function toggleBlue_Callback(hObject, eventdata, handles)
-    % hObject    handle to toggleBlue (see GCBO)
-    % eventdata  reserved - to be defined in a future version of MATLAB
-    % handles    structure with handles and user data (see GUIDATA)
-    
+
+   
     % Hint: get(hObject,'Value') returns toggle state of toggleBlue
     refreshMainDisplay(handles);
 
 
 function imsPerBuff_textBox_Callback(hObject, eventdata, handles)
-% hObject    handle to imsPerBuff_textBox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of imsPerBuff_textBox as text
+% eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'String') returns contents of imsPerBuff_textBox as text
 %        str2double(get(hObject,'String')) returns contents of imsPerBuff_textBox as a double
 
 
 % --- Executes during object creation, after setting all properties.
 function imsPerBuff_textBox_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to imsPerBuff_textBox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -187,20 +157,12 @@ end
 
 
 function blue_maskTextBox_Callback(hObject, eventdata, handles)
-% hObject    handle to blue_maskTextBox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of blue_maskTextBox as text
+% eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'String') returns contents of blue_maskTextBox as text
 %        str2double(get(hObject,'String')) returns contents of blue_maskTextBox as a double
 
 
 % --- Executes during object creation, after setting all properties.
 function blue_maskTextBox_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to blue_maskTextBox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -210,20 +172,12 @@ end
 
 
 function green_maskTextBox_Callback(hObject, eventdata, handles)
-% hObject    handle to green_maskTextBox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of green_maskTextBox as text
+% eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'String') returns contents of green_maskTextBox as text
 %        str2double(get(hObject,'String')) returns contents of green_maskTextBox as a double
 
 
 % --- Executes during object creation, after setting all properties.
 function green_maskTextBox_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to green_maskTextBox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -233,20 +187,12 @@ end
 
 
 function red_maskTextBox_Callback(hObject, eventdata, handles)
-% hObject    handle to red_maskTextBox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
 % Hints: get(hObject,'String') returns contents of red_maskTextBox as text
 %        str2double(get(hObject,'String')) returns contents of red_maskTextBox as a double
 
 
 % --- Executes during object creation, after setting all properties.
 function red_maskTextBox_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to red_maskTextBox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -256,20 +202,12 @@ end
 
 % --- Executes on slider movement.
 function red_maskSlider_Callback(hObject, eventdata, handles)
-% hObject    handle to red_maskSlider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 
 
 % --- Executes during object creation, after setting all properties.
 function red_maskSlider_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to red_maskSlider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
 % Hint: slider controls usually have a light gray background.
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
@@ -278,20 +216,12 @@ end
 
 % --- Executes on slider movement.
 function green_maskSlider_Callback(hObject, eventdata, handles)
-% hObject    handle to green_maskSlider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
+% eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 
 
 % --- Executes during object creation, after setting all properties.
 function green_maskSlider_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to green_maskSlider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
 % Hint: slider controls usually have a light gray background.
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
@@ -300,20 +230,12 @@ end
 
 % --- Executes on slider movement.
 function blue_maskSlider_Callback(hObject, eventdata, handles)
-% hObject    handle to blue_maskSlider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 
 
 % --- Executes during object creation, after setting all properties.
 function blue_maskSlider_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to blue_maskSlider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
 % Hint: slider controls usually have a light gray background.
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
@@ -322,20 +244,12 @@ end
 
 % --- Executes on slider movement.
 function transparency_maskSlider_Callback(hObject, eventdata, handles)
-% hObject    handle to transparency_maskSlider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
+% eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 
 
 % --- Executes during object creation, after setting all properties.
 function transparency_maskSlider_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to transparency_maskSlider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
 % Hint: slider controls usually have a light gray background.
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
@@ -344,20 +258,12 @@ end
 
 
 function transparency_textBox_Callback(hObject, eventdata, handles)
-% hObject    handle to transparency_textBox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of transparency_textBox as text
+% eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'String') returns contents of transparency_textBox as text
 %        str2double(get(hObject,'String')) returns contents of transparency_textBox as a double
 
 
 % --- Executes during object creation, after setting all properties.
 function transparency_textBox_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to transparency_textBox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -366,20 +272,12 @@ end
 
 
 function currImInBuff_textBox_Callback(hObject, eventdata, handles)
-% hObject    handle to currImInBuff_textBox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of currImInBuff_textBox as text
+% eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'String') returns contents of currImInBuff_textBox as text
 %        str2double(get(hObject,'String')) returns contents of currImInBuff_textBox as a double
 
 
 % --- Executes during object creation, after setting all properties.
 function currImInBuff_textBox_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to currImInBuff_textBox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -387,87 +285,109 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in loadNextBuffer.
-function loadNextBuffer_Callback(hObject, eventdata, handles)
-% hObject    handle to loadNextBuffer (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
 % --- Executes on button press in runStats.
 function runStats_Callback(hObject, eventdata, handles)
-% hObject    handle to runStats (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
 
 % --- Executes on button press in exportResults.
 function exportResults_Callback(hObject, eventdata, handles)
-% hObject    handle to exportResults (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
+
+% --- Executes on button press in loadNextBuffer.
+function loadNextBuffer_Callback(hObject, eventdata, handles)
+    %% Loads the next set of images into the imageBuffer
+    % Number of images loaded is deterimed by user input
+    global bufferInds
+
+    % Get index array
+    bufferSize = get(handles.imsPerBuff_textBox, 'Value');
+
+    if bufferSize <= length(bufferInds)
+        inds = bufferInds(1:bufferSize);
+        bufferInds(1:bufferSize) = [];
+    else
+        inds = bufferInds(1:end);
+        bufferInds(1:end) = [];
+    end
+
+    % Buffer over indexes
+    bufferImages(inds)
 
 
 function displayNextImage(handles)
     %% Displays the next image, wraps around if the last image is being displayed
-    global images currImInd currIm
+    global currImInd imageBuffer
 
-    if currImInd >= size(images, 1)
+    if currImInd >= size(imageBuffer, 1)
         currImInd = 1;
     else
         currImInd = currImInd + 1;
     end
 
-    setCurrIm(images(currImInd).path)
     refreshMainDisplay(handles)
+    set(handles.currImInBuff_textBox, 'Value', currImInd)
 
 
 function displayPreviousImage(handles)
     %% Loads the previous image in images then refreshes the main display
-    global images currImInd currIm
+    global currImInd imageBuffer
 
     if currImInd <= 1
-        currImInd = size(images, 1);
+        currImInd = size(imageBuffer, 1);
     else
         currImInd = currImInd - 1;
     end
 
-    setCurrIm(images(currImInd).path)
     refreshMainDisplay(handles)
+    set(handles.currImInBuff_textBox, 'Value', currImInd)
 
 
 function displayFirstImage(handles)
     %% Displays the first image in the images struct
-    global currIm currImInd images
+    global imageBuffer currImInd images
+
     currImInd = 1;
-    setCurrIm(images(currImInd).path)
+
+    % buffer the first image in images if none have been buffered yet
+    if isempty(imageBuffer)
+        bufferImages(1);
+    end
+
     refreshMainDisplay(handles)
+    set(handles.currImInBuff_textBox, 'Value', currImInd)
 
 
-function setCurrIm(imPath)
-    global currIm
-    currIm.image = mat2gray(imread(imPath));
-    currIm.labIm = [];
+function bufferImages(inds)
+    %% fills imageBuffer with images from the "images" object array indexed by "inds"
+    global imageBuffer images
+
+    imageBuffer = [];
+    for i = 1:length(inds)
+        if isempty(imageBuffer)
+            imageBuffer = bufferedImage(images(inds(i)));
+        else
+            imageBuffer(i) = bufferedImage(images(inds(i)));
+        end
+    end
 
 
 function refreshMainDisplay(handles)
     %% Resets the main display to display images(currImInd)
     % Load im
-    global currIm
-
-    dispIm = checkChannelsToDisplay(currIm.image, handles);
+    global imageBuffer currImInd
+    currImInd
+    dispIm = checkChannelsToDisplay(imageBuffer(currImInd).im, handles);
     displayOnMain(dispIm, handles)
 
     if currImHasLabIm()
-        overlayOnMain(im2bw(currIm.labIm, 0), handles)
+        overlayOnMain(im2bw(imageBuffer(currImInd).labIm, 0), handles)
     end
 
 
 function result = currImHasLabIm()
     %% Checks if the currIm has a neuron labIm
-    global currIm
-    result = any(strcmp('labIm', fieldnames(currIm))) && ~isempty(currIm.labIm);
+    global imageBuffer currImInd
+    result = ~isempty(imageBuffer(currImInd).labIm);
 
 
 function imOut = checkChannelsToDisplay(imIn, h)
@@ -506,55 +426,38 @@ function overlayOnMain(overlay, handles)
 %% Image Editing Functions
 function manipulateNeuronLabels(handles)
     %% Function to allow user manipulation of the neuron mask over currIm
-    global currIm
+    global imageBuffer currImInd
 
     % Make there is a neuron mask to work with
     if ~currImHasLabIm()
-        currIm.labIm = logical(zeros(size(currIm.image)));
+        imageBuffer(currImInd).labIm = double(zeros(size(imageBuffer(currImInd).im)));
     end
 
     % Get input
     inpt = getInputFromMainDisplay(handles);
 
     % Process input
-    processMainDisplayInput(inpt);
+    processMainDisplayInput(imageBuffer(currImInd), inpt);
 
     % Refresh Main Display
     refreshMainDisplay(handles);
 
 
-function processMainDisplayInput(in)
+function processMainDisplayInput(imBuffer, in)
     %% Calls removeNeurons and addNeurons accordingly
-
+    % "input.buttonPress"
     coordsToAdd = in.bp == 1;
     coordsToRemove = in.bp ==3;
 
-    removeNeurons(in.xInds(coordsToRemove), in.yInds(coordsToRemove));
-    addNeurons(in.xInds(coordsToAdd), in.yInds(coordsToAdd));
+    % Add and remove neurons
+    addNeurons(imBuffer, in.xInds(coordsToAdd), in.yInds(coordsToAdd));
+    removeNeurons(imBuffer, in.xInds(coordsToRemove), in.yInds(coordsToRemove));
 
 
-function removeNeurons(xInds, yInds)
-    %% Removes neurons from currIm.neurons and .labIm
-    global currIm
-    for i = 1:length(xInds)
-        nr = yInds(i);
-        nc = xInds(i);
-
-        % nr, nc
-        nKey = currIm.labIm(nr, nc);
-        
-        % remove key, update labIm
-        if currIm.neurons.isKey(nKey)
-            currIm.neurons.remove(nKey);
-            currIm.labIm(currIm.labIm == nKey) = 0;
-        end
-    end
-
-function addNeurons(xInds, yInds)
-    %% Adds neurons to currIm.neurons and .labIm
-    global currIm
+function addNeurons(imBuffer, xInds, yInds)
+    %% Adds neurons to imageBuffer.neurons and .labIm
     nRad = 15; % TODO: Make this user defined
-    [X, Y] = meshgrid(1:size(currIm.labIm, 2), 1:size(currIm.labIm, 1));
+    [X, Y] = meshgrid(1:size(imBuffer.labIm, 2), 1:size(imBuffer.labIm, 1));
 
     for i = 1:length(xInds)
         x = xInds(i);
@@ -564,12 +467,29 @@ function addNeurons(xInds, yInds)
         newNeuron.Centroid = [x, y];
         newNeuron.BoundingBox = [[x, y] - nRad, nRad*2, nRad*2];
 
-        nKey = max(currIm.labIm(:)) + 1;
-        currIm.neurons(nKey) = newNeuron;
+        nKey = max(imBuffer.labIm(:)) + 1;
+        imBuffer.dataObj.neurons(nKey) = newNeuron;
 
         % draw a circle on labIm
         circleInds = nRad^2 >= (X - x).^2 + (Y - y).^2;
-        currIm.labIm(circleInds) = nKey;
+        imBuffer.labIm(circleInds) = nKey;
+    end
+
+
+function removeNeurons(imBuffer, xInds, yInds)
+    %% Removes neurons from imBuffer.dataObj.neurons and .labIm
+    for i = 1:length(xInds)
+        nr = yInds(i);
+        nc = xInds(i);
+
+        % nr, nc
+        nKey = imBuffer.labIm(nr, nc);
+        
+        % remove key, update labIm
+        if imBuffer.dataObj.neurons.isKey(nKey)
+            imBuffer.dataObj.neurons.remove(nKey);
+            imBuffer.labIm(imBuffer.labIm == nKey) = 0;
+        end
     end
 
 
