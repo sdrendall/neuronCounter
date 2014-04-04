@@ -85,7 +85,7 @@ function nextImage_Callback(hObject, eventdata, handles)
 % --- Executes on button press in saveDisplayedImage.
 function saveDisplayedImage_Callback(hObject, eventdata, handles)
 
-   [filename, path] = uiputfile('*.tif', 'Save as...');
+    [filename, path] = uiputfile('*.tif', 'Save as...');
     export_fig(handles.mainDisplay, fullfile(path, filename))
     
 
@@ -114,7 +114,7 @@ function findNeurons_Callback(hObject, eventdata, handles)
     global imageBuffer
 
     for i = 1:length(imageBuffer)
-        [imageBuffer(i).labIm, imageBuffer(i).neurons] = findNeuronsAlgorithm(imageBuffer(i).im);
+        [imageBuffer(i).labIm, imageBuffer(i).dataObj.neurons] = findNeuronsAlgorithm(imageBuffer(i).im);
     end
 
     refreshMainDisplay(handles);
@@ -363,9 +363,11 @@ function displayFirstImage(handles)
 function bufferImages(inds)
     %% fills imageBuffer with images from the "images" object array indexed by "inds"
     global imageBuffer images
-    inds
 
-    imageBuffer = []
+    % Bulky for memory management, clear old buffer, create new global
+    clear imageBuffer
+    global imageBuffer
+    imageBuffer = [];
     for i = 1:length(inds)
         imageBuffer = [imageBuffer, bufferedImage(images(inds(i)))];
     end
