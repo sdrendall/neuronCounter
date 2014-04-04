@@ -121,25 +121,19 @@ function findNeurons_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in toggleGreen.
-function toggleGreen_Callback(hObject, eventdata, handles)
-
-   
+function toggleGreen_Callback(hObject, eventdata, handles)   
     % Hint: get(hObject,'Value') returns toggle state of toggleGreen
     refreshMainDisplay(handles);
 
 
 % --- Executes on button press in toggleRed.
-function toggleRed_Callback(hObject, eventdata, handles)
-
-   
+function toggleRed_Callback(hObject, eventdata, handles)   
     % Hint: get(hObject,'Value') returns toggle state of toggleRed
     refreshMainDisplay(handles);
 
 
 % --- Executes on button press in toggleBlue.
-function toggleBlue_Callback(hObject, eventdata, handles)
-
-   
+function toggleBlue_Callback(hObject, eventdata, handles)   
     % Hint: get(hObject,'Value') returns toggle state of toggleBlue
     refreshMainDisplay(handles);
 
@@ -151,31 +145,35 @@ function imsPerBuff_textBox_Callback(hObject, eventdata, handles)
 
 % --- Executes during object creation, after setting all properties.
 function imsPerBuff_textBox_CreateFcn(hObject, eventdata, handles)
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    % Hint: edit controls usually have a white background on Windows.
+    %       See ISPC and COMPUTER.
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 
 
 function blue_maskTextBox_Callback(hObject, eventdata, handles)
-% eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'String') returns contents of blue_maskTextBox as text
-%        str2double(get(hObject,'String')) returns contents of blue_maskTextBox as a double
-
+    % eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'String') returns contents of blue_maskTextBox as text
+    %        str2double(get(hObject,'String')) returns contents of blue_maskTextBox as a double
+    myValue = get(handles.blue_maskTextBox, 'String');
+    set(handles.blue_maskSlider, 'Value', num2str(myValue))
+    refreshMainDisplay(handles)
 
 % --- Executes during object creation, after setting all properties.
 function blue_maskTextBox_CreateFcn(hObject, eventdata, handles)
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    % Hint: edit controls usually have a white background on Windows.
+    %       See ISPC and COMPUTER.
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 
 
 function green_maskTextBox_Callback(hObject, eventdata, handles)
-% eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'String') returns contents of green_maskTextBox as text
-%        str2double(get(hObject,'String')) returns contents of green_maskTextBox as a double
-
+    % eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'String') returns contents of green_maskTextBox as text
+    %        str2double(get(hObject,'String')) returns contents of green_maskTextBox as a double
+    myValue = get(handles.green_maskTextBox, 'String');
+    set(handles.green_maskSlider, 'Value', num2str(myValue))
+    refreshMainDisplay(handles)
 
 % --- Executes during object creation, after setting all properties.
 function green_maskTextBox_CreateFcn(hObject, eventdata, handles)
@@ -188,8 +186,11 @@ end
 
 
 function red_maskTextBox_Callback(hObject, eventdata, handles)
-% Hints: get(hObject,'String') returns contents of red_maskTextBox as text
-%        str2double(get(hObject,'String')) returns contents of red_maskTextBox as a double
+    % Hints: get(hObject,'String') returns contents of red_maskTextBox as text
+    %        str2double(get(hObject,'String')) returns contents of red_maskTextBox as a double
+    myValue = get(handles.red_maskTextBox, 'String');
+    set(handles.red_maskSlider, 'Value', num2str(myValue))
+    refreshMainDisplay(handles)
 
 
 % --- Executes during object creation, after setting all properties.
@@ -203,8 +204,11 @@ end
 
 % --- Executes on slider movement.
 function red_maskSlider_Callback(hObject, eventdata, handles)
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+    % Hints: get(hObject,'Value') returns position of slider
+    %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+    myValue = get(handles.red_maskSlider, 'Value');
+    set(handles.red_maskTextBox, 'String', num2str(myValue))
+    refreshMainDisplay(handles);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -217,59 +221,70 @@ end
 
 % --- Executes on slider movement.
 function green_maskSlider_Callback(hObject, eventdata, handles)
-% eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+    % eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'Value') returns position of slider
+    %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+    myValue = get(handles.green_maskSlider, 'Value');
+    set(handles.green_maskTextBox, 'String', num2str(myValue))
+    refreshMainDisplay(handles);
 
 
 % --- Executes during object creation, after setting all properties.
 function green_maskSlider_CreateFcn(hObject, eventdata, handles)
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
+    % Hint: slider controls usually have a light gray background.
+    if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor',[.9 .9 .9]);
+    end
 
 
 % --- Executes on slider movement.
 function blue_maskSlider_Callback(hObject, eventdata, handles)
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+    % Hints: get(hObject,'Value') returns position of slider
+    %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+    myValue = get(handles.blue_maskSlider, 'Value');
+    set(handles.blue_maskTextBox, 'String', num2str(myValue))
+    refreshMainDisplay(handles);
 
 
 % --- Executes during object creation, after setting all properties.
 function blue_maskSlider_CreateFcn(hObject, eventdata, handles)
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
+    % Hint: slider controls usually have a light gray background.
+    if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor',[.9 .9 .9]);
+    end  
 
 
 % --- Executes on slider movement.
 function transparency_maskSlider_Callback(hObject, eventdata, handles)
-% eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+    % eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'Value') returns position of slider
+    %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+    myValue = get(handles.transparency_maskSlider, 'Value');
+    set(handles.transparency_textBox, 'String', num2str(myValue))
 
 
 % --- Executes during object creation, after setting all properties.
 function transparency_maskSlider_CreateFcn(hObject, eventdata, handles)
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
+    % Hint: slider controls usually have a light gray background.
+    if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor',[.9 .9 .9]);
+    end
 
 
 
 function transparency_textBox_Callback(hObject, eventdata, handles)
-% eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'String') returns contents of transparency_textBox as text
-%        str2double(get(hObject,'String')) returns contents of transparency_textBox as a double
+    % eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'String') returns contents of transparency_textBox as text
+    %        str2double(get(hObject,'String')) returns contents of transparency_textBox as a double
+    myValue = get(handles.transparency_textBox, 'String');
+    set(handles.transparency_maskSlider, ValueString', num2str(myValue))
+    refreshMainDisplay(handles)
 
 
 % --- Executes during object creation, after setting all properties.
 function transparency_textBox_CreateFcn(hObject, eventdata, handles)
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    % Hint: edit controls usually have a white background on Windows.
+    %       See ISPC and COMPUTER.
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 
 
 function currImInBuff_textBox_Callback(hObject, eventdata, handles)
@@ -301,7 +316,7 @@ function loadNextBuffer_Callback(hObject, eventdata, handles)
     global bufferInds
 
     % Get index array
-    bufferSize = get(handles.imsPerBuff_textBox, 'Value')
+    bufferSize = str2double(get(handles.imsPerBuff_textBox, 'String'))
 
     if bufferSize <= length(bufferInds)
         inds = bufferInds(1:bufferSize);
@@ -328,7 +343,7 @@ function displayNextImage(handles)
     end
 
     refreshMainDisplay(handles)
-    set(handles.currImInBuff_textBox, 'Value', currImInd)
+    set(handles.currImInBuff_textBox, 'String', num2str(currImInd))
 
 
 function displayPreviousImage(handles)
@@ -342,7 +357,7 @@ function displayPreviousImage(handles)
     end
 
     refreshMainDisplay(handles)
-    set(handles.currImInBuff_textBox, 'Value', currImInd)
+    set(handles.currImInBuff_textBox, 'String', num2str(currImInd))
 
 
 function displayFirstImage(handles)
@@ -357,7 +372,7 @@ function displayFirstImage(handles)
     end
 
     refreshMainDisplay(handles)
-    set(handles.currImInBuff_textBox, 'Value', currImInd)
+    set(handles.currImInBuff_textBox, 'String', num2str(currImInd))
 
 
 function bufferImages(inds)
@@ -422,8 +437,11 @@ function displayOnMain(im, handles)
 
 function overlayOnMain(overlay, handles)
     %% Overlays an image on the main displays
-    trans = .5;
-    clr = [1 0 0];
+    trans = get(handles.transparency_textBox, str2double('String'));
+    r = get(handles.red_maskSlider, str2double('String'));
+    g = get(handles.green_maskSlider, str2double('String'));
+    b = get(handles.blue_maskSlider, str2double('String'));
+    clr = [r g b];
     axes(handles.mainDisplay)
     alphamask(overlay, clr, trans);
 
