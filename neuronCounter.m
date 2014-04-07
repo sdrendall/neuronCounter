@@ -22,7 +22,7 @@ function varargout = neuronCounter(varargin)
 
 % Edit the above text to modify the response to help neuronCounter
 
-% Last Modified by GUIDE v2.5 03-Apr-2014 18:12:55
+% Last Modified by GUIDE v2.5 07-Apr-2014 11:03:48
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -156,7 +156,7 @@ function blue_maskTextBox_Callback(hObject, eventdata, handles)
     % eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'String') returns contents of blue_maskTextBox as text
     %        str2double(get(hObject,'String')) returns contents of blue_maskTextBox as a double
     myValue = get(handles.blue_maskTextBox, 'String');
-    set(handles.blue_maskSlider, 'Value', num2str(myValue))
+    set(handles.blue_maskSlider, 'Value', str2double(myValue))
     refreshMainDisplay(handles)
 
 % --- Executes during object creation, after setting all properties.
@@ -172,7 +172,7 @@ function green_maskTextBox_Callback(hObject, eventdata, handles)
     % eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'String') returns contents of green_maskTextBox as text
     %        str2double(get(hObject,'String')) returns contents of green_maskTextBox as a double
     myValue = get(handles.green_maskTextBox, 'String');
-    set(handles.green_maskSlider, 'Value', num2str(myValue))
+    set(handles.green_maskSlider, 'Value', str2double(myValue))
     refreshMainDisplay(handles)
 
 % --- Executes during object creation, after setting all properties.
@@ -189,7 +189,7 @@ function red_maskTextBox_Callback(hObject, eventdata, handles)
     % Hints: get(hObject,'String') returns contents of red_maskTextBox as text
     %        str2double(get(hObject,'String')) returns contents of red_maskTextBox as a double
     myValue = get(handles.red_maskTextBox, 'String');
-    set(handles.red_maskSlider, 'Value', num2str(myValue))
+    set(handles.red_maskSlider, 'Value', str2double(myValue))
     refreshMainDisplay(handles)
 
 
@@ -217,6 +217,7 @@ function red_maskSlider_CreateFcn(hObject, eventdata, handles)
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
+
 
 
 % --- Executes on slider movement.
@@ -259,6 +260,7 @@ function transparency_maskSlider_Callback(hObject, eventdata, handles)
     %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
     myValue = get(handles.transparency_maskSlider, 'Value');
     set(handles.transparency_textBox, 'String', num2str(myValue))
+    refreshMainDisplay(handles)
 
 
 % --- Executes during object creation, after setting all properties.
@@ -274,7 +276,7 @@ function transparency_textBox_Callback(hObject, eventdata, handles)
     % eventdata  reserved - to be defined in a future version of MATLAB% Hints: get(hObject,'String') returns contents of transparency_textBox as text
     %        str2double(get(hObject,'String')) returns contents of transparency_textBox as a double
     myValue = get(handles.transparency_textBox, 'String');
-    set(handles.transparency_maskSlider, ValueString', num2str(myValue))
+    set(handles.transparency_maskSlider, 'Value', str2double(myValue))
     refreshMainDisplay(handles)
 
 
@@ -437,11 +439,11 @@ function displayOnMain(im, handles)
 
 function overlayOnMain(overlay, handles)
     %% Overlays an image on the main displays
-    trans = str2double(get(handles.transparency_textBox, 'String'));
-    r = str2double(get(handles.red_maskSlider, 'String'));
-    g = str2double(get(handles.green_maskSlider, 'String'));
-    b = str2double(get(handles.blue_maskSlider, 'String'));
-    clr = [r g b];
+    trans = str2double(get(handles.transparency_textBox, 'String'))
+    r = str2double(get(handles.red_maskTextBox, 'String'));
+    g = str2double(get(handles.green_maskTextBox, 'String'));
+    b = str2double(get(handles.blue_maskTextBox, 'String'));
+    clr = [r g b]
     axes(handles.mainDisplay)
     alphamask(overlay, clr, trans);
 
