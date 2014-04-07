@@ -3,11 +3,13 @@ function [labIm, neurons] = findNeuronsAlgorithm(im)
 
 green = im(:,:,2);
 
-bwIm = im2bw(green, graythresh(green));
+filtIm = imfilter(green, fspecial('disk', 12));
+
+bwIm = im2bw(filtIm, graythresh(filtIm));
 
 labIm = bwlabel(bwIm);
 
-props = regionprops(labIm);
+props = regionprops(labIm, 'all');
 
 % Filter objects by area
 neuronCt = 0;

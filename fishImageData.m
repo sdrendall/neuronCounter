@@ -10,6 +10,7 @@ classdef fishImageData < handle
         isdir
         datenum
         neurons = containers.Map('KeyType', 'double', 'ValueType', 'any');
+        totalNeuronCount
         data
     end
 

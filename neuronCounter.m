@@ -59,6 +59,11 @@ function neuronCounter_OpeningFcn(hObject, eventdata, handles, varargin)
     % UIWAIT makes neuronCounter wait for user response (see UIRESUME)
     % uiwait(handles.figure1);
 
+    % Open a parallel pool, for increased processing speed
+    if matlabpool('size') == 0
+        parpool();
+    end
+
     imageBuffer = [];
 
 
@@ -113,9 +118,7 @@ function markNeurons_Callback(hObject, eventdata, handles)
 function findNeurons_Callback(hObject, eventdata, handles)
     global imageBuffer
 
-    for i = 1:length(imageBuffer)
-        [imageBuffer(i).labIm, imageBuffer(i).dataObj.neurons] = findNeuronsAlgorithm(imageBuffer(i).im);
-    end
+    imageBuffer = analyzeImages(imageBuffer);
 
     refreshMainDisplay(handles);
 
@@ -439,13 +442,34 @@ function displayOnMain(im, handles)
 
 function overlayOnMain(overlay, handles)
     %% Overlays an image on the main displays
-    trans = str2double(get(handles.transparency_textBox, 'String'))
+    trans = str2double(get(handles.transparency_textBox, 'String'));
     r = str2double(get(handles.red_maskTextBox, 'String'));
     g = str2double(get(handles.green_maskTextBox, 'String'));
     b = str2double(get(handles.blue_maskTextBox, 'String'));
-    clr = [r g b]
+    clr = [r g b];
     axes(handles.mainDisplay)
     alphamask(overlay, clr, trans);
+
+
+%% Image Processing Functions
+function imBuff = analyzeImages(imBuff)
+    %% Wrapper function to allow for parallelization 
+    parfor i = 1:length(imBuff)
+        [imBuff(i).labIm, imBuff(i).dataObj.neurons] = findNeuronsAlgorithm(imBuff(i).im);
+        imBuff(i).dataObj.totalNeuronCount = estimateTotalNeuronsFromDapi(imBuff(i).im);
+    end
+
+    for i = 1:length(imBuff)
+        disp(['totalNeuronCount: ', num2str(imBuff(i).dataObj.totalNeuronCount)])
+        disp(['% expressing neurons', num2str(imBuff(i).dataObj.neurons.Count)])
+    end
+
+
+function neuronCount = estimateTotalNeuronsFromDapi(im)
+    dapi = im(:,:,3);
+    bw = im2bw(dapi, graythresh(dapi));
+    % estimate number of nuclei based on avg number of pixels in a nucleus
+    neuronCount = sum(bw(:))/(100*pi);
 
 
 %% Image Editing Functions
