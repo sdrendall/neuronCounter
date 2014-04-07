@@ -437,10 +437,10 @@ function displayOnMain(im, handles)
 
 function overlayOnMain(overlay, handles)
     %% Overlays an image on the main displays
-    trans = get(handles.transparency_textBox, str2double('String'));
-    r = get(handles.red_maskSlider, str2double('String'));
-    g = get(handles.green_maskSlider, str2double('String'));
-    b = get(handles.blue_maskSlider, str2double('String'));
+    trans = str2double(get(handles.transparency_textBox, 'String'));
+    r = str2double(get(handles.red_maskSlider, 'String'));
+    g = str2double(get(handles.green_maskSlider, 'String'));
+    b = str2double(get(handles.blue_maskSlider, 'String'));
     clr = [r g b];
     axes(handles.mainDisplay)
     alphamask(overlay, clr, trans);
