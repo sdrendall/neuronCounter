@@ -1,20 +1,40 @@
 function testWs(im)
 
-    logIm = log(double(im));
+    % the log method
+
+    logIm = log2(double(im));
+    nIm = mat2gray(logIm);
+    fIm = imfilter(nIm, fspecial('disk', 12));
+
+    section = im2bw(fIm, graythresh(fIm));
+    thresh = graythresh(fIm(section))
+    m = mean(fIm(section))
+    stdev = std(fIm(section))
+    cells = im2bw(fIm, thresh);
+
+    figure
+    imshow(im)
+    alphamask(cells);
+    title('cells - log')
+
+    % no log method
+
     nIm = mat2gray(im);
-    fIm = imfilter(nIm, fspecial('disk', 8));
+    fIm = imfilter(nIm, fspecial('disk', 12));
+
     cells = im2bw(fIm, graythresh(fIm));
 
-    c = figure;
-    imshow(cells)
-    title('cells')
+    figure
+    imshow(im)
+    alphamask(cells);
+    title('cells - no log')
+
 
     pause
-    close(c)
+    close all
 
-    toWs = -fIm;
-    toWs(~cells) = -Inf;
 
-    ws = watershed(toWs);
-
-    figure, imshow(ws, [])
+%    toWs = -fIm;
+%    toWs(~cells) = -Inf;
+%
+%    ws = watershed(toWs);

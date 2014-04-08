@@ -3,9 +3,9 @@ function [labIm, neurons] = findNeuronsAlgorithm(im)
 
 green = im(:,:,2);
 
-filtIm = imfilter(green, fspecial('disk', 12));
+%filtIm = imfilter(green, fspecial('disk', 12));
 
-bwIm = im2bw(filtIm, graythresh(filtIm));
+bwIm = im2bw(green, graythresh(green));
 
 labIm = bwlabel(bwIm);
 
