@@ -77,7 +77,6 @@ function [labIm, neuronProps] = findNeurons(im)
     [labIm, neuronProps] = removeObjects(labIm, neuronProps, disqualifiedObjects);
 
 
-
 function [labIm, objData] = removeObjects(labIm, objData, indsToRemove)
     % Removes objects from objData and sets corresponding pixels in labIm to 0
     % for each entry in objData
