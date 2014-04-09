@@ -1,4 +1,4 @@
-classdef fishImageData < handle
+classdef fishImage < handle
     properties
         path
         containingDirName
@@ -15,7 +15,7 @@ classdef fishImageData < handle
     end
 
     methods
-        function obj = fishImageData(file, containingDirPath)
+        function obj = fishImage(file, containingDirPath)
             % Add dir() created fields to the obj
             fileFields = fieldnames(file);
             for i = 1:length(fileFields)

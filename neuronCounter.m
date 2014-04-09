@@ -453,20 +453,17 @@ function overlayOnMain(overlay, handles)
 
 %% Image Processing Functions
 function imBuff = analyzeImages(imBuff)
-    %% Wrapper function to allow for parallelization 
-    %parfor i = 1:length(imBuff)
-    %    [imBuff(i).labIm, imBuff(i).dataObj.neurons] = findNeuronsAlgorithm(imBuff(i).im);
-    %    imBuff(i).dataObj.totalNeuronCount = estimateTotalNeuronsFromDapi(imBuff(i).im);
-    %end
-    %
-    %for i = 1:length(imBuff)
-    %    disp(['totalNeuronCount: ', num2str(imBuff(i).dataObj.totalNeuronCount)])
-    %    disp(['% expressing neurons', num2str(imBuff(i).dataObj.neurons.Count)])
-    %end
-
-    for i = 1:length(imBuff)
-        testWs(imBuff(i).im(:,:,2));
+    % Wrapper function to allow for parallelization 
+    parfor i = 1:length(imBuff)
+        [imBuff(i).labIm, imBuff(i).dataObj.neurons] = findNeuronsAlgorithm(imBuff(i).im);
+        imBuff(i).dataObj.totalNeuronCount = estimateTotalNeuronsFromDapi(imBuff(i).im);
     end
+    
+    for i = 1:length(imBuff)
+        disp(['totalNeuronCount: ', num2str(imBuff(i).dataObj.totalNeuronCount)])
+        disp(['% expressing neurons', num2str(imBuff(i).dataObj.neurons.Count)])
+    end
+
 
 function neuronCount = estimateTotalNeuronsFromDapi(im)
     dapi = im(:,:,3);

@@ -1,5 +1,5 @@
 function imageData = searchForFISHImages(startPath, filetype)
-%% imageData = searchForFISHimageData(startPath, filetype)
+%% imageData = searchForFISHimages(startPath, filetype)
 % 
 % Recursively searches for imageData, starting at startPath
 % Returns a structure 'imageData' that contains the image's filename (name), path,
@@ -47,14 +47,14 @@ if length(cdContents) == 0
     return
 end
 
-% Create fishImageData objects for files with appropriate extensions
+% Create fishImage objects for files with appropriate extensions
 for i = 1:length(cdContents)
     [~, ~, ext] = fileparts(cdContents(i).name);
     if any(strcmpi(ext, filetype))
         if ~exist('imageData', 'var') || isempty(imageData)
-            imageData = fishImageData(cdContents(i), startPath);
+            imageData = fishImage(cdContents(i), startPath);
         else
-            imageData(end + 1) = fishImageData(cdContents(i), startPath);
+            imageData(end + 1) = fishImage(cdContents(i), startPath);
         end
     end
 end
