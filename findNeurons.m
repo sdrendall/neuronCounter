@@ -13,28 +13,21 @@ function [labIm, neuronProps] = findNeurons(im)
     % Log -- probably a better way to accentuate image
     logIm = mat2gray(log2(green));
 
-    figure,imshow(logIm, [])
-    title('after log')
-    pause
-
     % segment -- should reveal section
     filtIm = imfilter(logIm, fspecial('disk', 10));
     section = im2bw(filtIm, graythresh(filtIm));
-    
-    figure,imshow(filtIm, [])
-    title('after filtering')
-    pause
-
-    figure,imshow(section, [])
-    title('section')
-    pause
 
     % segment -- for cells (or a big mess if no cells are present)
     cells = im2bw(filtIm, graythresh(filtIm(section)));
 
-    figure,imshow(cells, [])
-    title('after segmentation')
-    pause
+    % A bit of morphological preprocessing 
+    % taken directly from hunter elliot's spot detector
+    cells = bwmorph(cells, 'clean'); % remove isolated pixels
+    cells = bwmorph(cells, 'fill'); % fill isolated holes
+    cells = bwmorph(cells, 'thicken');
+    cells = bwmorph(cells, 'spur'); % remove single pixels 8-attached to clusters
+    cells = bwmorph(cells, 'spur');
+    cells = bwmorph(cells, 'clean');
 
     % label cells and get properties
     cells = bwlabel(cells);
@@ -55,34 +48,34 @@ function [labIm, neuronProps] = findNeurons(im)
     % Union disqualifiers
     disqualifiedCells = tooLarge | tooLong | tooSparse;
 
-    figure, imshow(cells, [])
-    title('before removeObjects')
-    pause
-
     % Remove cells
     cells = removeObjects(cells, cellProps, disqualifiedCells);
-
-    figure, imshow(cells, [])
-    title('before watershed')
-    pause
+    cells = cells > 0;
 
     % Watershed cells
-    labIm = watershedCells(filtIm, logical(im2bw(cells, 0)));
-
-    figure,imshow(labIm, [])
-    title('after watershed')
-    pause
+    labIm = watershedCells(filtIm, cells);
 
     % Store neuron data in a hashmap
     neuronProps = containers.Map('KeyType', 'double', 'ValueType', 'any');
     tmpProps = regionprops(labIm, propertiesToStore);
+    tmpProps = calculateAvgIntensityAndStdForEachCell(green, labIm, tmpProps);
+
     for obj = 1:max(labIm(:))
         neuronProps(obj) = tmpProps(obj);
     end
 
+    % Get some information about the non neuron part of the section
+    green = mat2gray(green);    
+    section(section & cells) = 0;
+    labSection = bwlabel(section);
+    sectionProps = regionprops(labSection);
+    sectionProps = calculateAvgIntensityAndStdForEachCell(green, labSection, sectionProps);
+    sectionProps = sectionProps(find([sectionProps(:).Area] == max([sectionProps(:).Area])));
+
     % Remove non neuron objects
-    %disqualifiedObjects = distinguishNonNeurons(neuronProps);
-    %[labIm, neuronProps] = removeObjects(labIm, neuronProps, disqualifiedObjects);
+    disqualifiedObjects = distinguishNonNeurons(neuronProps, sectionProps);
+    [labIm, neuronProps] = removeObjects(labIm, neuronProps, disqualifiedObjects);
+
 
 
 function [labIm, objData] = removeObjects(labIm, objData, indsToRemove)
@@ -120,5 +113,34 @@ function wsIm = watershedCells(im, logMask)
     wsIm = watershed(toWs);
 
 
-function nonNeuronInds = distinguishNonNeurons(neuronProps)
-    nonNeuronInds = logical(zeros(size(neuronProps)));
+function propsOut = calculateAvgIntensityAndStdForEachCell(im, labIm, propsIn)
+    im = mat2gray(im);
+    propsOut = appendFields(propsIn, {'avgIntensity', 'std'});
+
+    for i = 1:length(propsOut)
+        propsOut(i).avgIntensity = mean(im(labIm == i));
+        propsOut(i).std = std(im(labIm == i));
+    end
+
+
+function nonNeuronInds = distinguishNonNeurons(neuronProps, sectionProps)
+    % Extract values
+    values = neuronProps.values();
+    areas = zeros(size(values));
+    avgIntensities = areas;
+    for i = 1:length(values)
+        areas(i) = values{i}.Area;
+        avgIntensities(i) = values{i}.avgIntensity;
+    end
+
+    % Determine a threshold based on the section's (discluding cells) mean intensity and std
+    % This is sort of arbitrary, Someday i'll use a t test or something here
+    intensityThreshold = sectionProps.avgIntensity + 1.5*sectionProps.std;
+
+    % Tests
+    tooBig = areas > 3500;
+    tooSmall = areas < 90;
+    tooWeak = avgIntensities < intensityThreshold;
+
+    % Union
+    nonNeuronInds = tooBig | tooSmall | tooWeak;

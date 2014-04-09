@@ -404,7 +404,7 @@ function refreshMainDisplay(handles)
     displayOnMain(dispIm, handles)
 
     if currImHasLabIm()
-        overlayOnMain(im2bw(imageBuffer(currImInd).labIm, 0), handles)
+        overlayOnMain(double(imageBuffer(currImInd).labIm > 1), handles)
     end
 
 
@@ -455,13 +455,15 @@ function overlayOnMain(overlay, handles)
 function imBuff = analyzeImages(imBuff)
     % Wrapper function to allow for parallelization 
     parfor i = 1:length(imBuff)
-        [imBuff(i).labIm, imBuff(i).dataObj.neurons] = findNeuronsAlgorithm(imBuff(i).im);
+        [imBuff(i).labIm, imBuff(i).dataObj.neurons] = findNeurons(imBuff(i).im);
         imBuff(i).dataObj.totalNeuronCount = estimateTotalNeuronsFromDapi(imBuff(i).im);
     end
     
     for i = 1:length(imBuff)
-        disp(['totalNeuronCount: ', num2str(imBuff(i).dataObj.totalNeuronCount)])
-        disp(['% expressing neurons', num2str(imBuff(i).dataObj.neurons.Count)])
+        totalNeurons = imBuff(i).dataObj.totalNeuronCount;
+        disp(['totalNeuronCount: ', num2str(totalNeurons)])
+        disp(['% expressing neurons: ', num2str(imBuff(i).dataObj.neurons.Count/totalNeurons)])
+        disp('------------------------------------')
     end
 
 
