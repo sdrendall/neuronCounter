@@ -48,7 +48,6 @@ end
 function neuronCounter_OpeningFcn(hObject, eventdata, handles, varargin)
     % This function has no output args, see OutputFcn.
     % varargin   command line arguments to neuronCounter (see VARARGIN)
-    global imageBuffer 
 
     % Choose default command line output for neuronCounter
     handles.output = hObject;
@@ -64,7 +63,11 @@ function neuronCounter_OpeningFcn(hObject, eventdata, handles, varargin)
         parpool();
     end
 
+    global imageBuffer images
+    clear imageBuffer images
+    global imageBuffer images
     imageBuffer = [];
+    images = [];
 
 
 % --- Outputs from this function are returned to the command line.
@@ -118,8 +121,7 @@ function markNeurons_Callback(hObject, eventdata, handles)
 function findNeurons_Callback(hObject, eventdata, handles)
     global imageBuffer
 
-    imageBuffer = analyzeImages(imageBuffer);
-
+    analyzeImagesInBuffer;
     refreshMainDisplay(handles);
 
 
@@ -180,12 +182,12 @@ function green_maskTextBox_Callback(hObject, eventdata, handles)
 
 % --- Executes during object creation, after setting all properties.
 function green_maskTextBox_CreateFcn(hObject, eventdata, handles)
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
+    % Hint: edit controls usually have a white background on Windows.
+    %       See ISPC and COMPUTER.
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+    
 
 
 function red_maskTextBox_Callback(hObject, eventdata, handles)
@@ -198,11 +200,11 @@ function red_maskTextBox_Callback(hObject, eventdata, handles)
 
 % --- Executes during object creation, after setting all properties.
 function red_maskTextBox_CreateFcn(hObject, eventdata, handles)
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    % Hint: edit controls usually have a white background on Windows.
+    %       See ISPC and COMPUTER.
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 
 
 % --- Executes on slider movement.
@@ -216,11 +218,11 @@ function red_maskSlider_Callback(hObject, eventdata, handles)
 
 % --- Executes during object creation, after setting all properties.
 function red_maskSlider_CreateFcn(hObject, eventdata, handles)
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
+    % Hint: slider controls usually have a light gray background.
+    if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor',[.9 .9 .9]);
+    end
+    
 
 
 % --- Executes on slider movement.
@@ -308,10 +310,27 @@ end
 
 % --- Executes on button press in runStats.
 function runStats_Callback(hObject, eventdata, handles)
-
+    global images
+    for i = 1:length(images)
+        disp(images(i))
+        disp('----------------')
+    end
 
 % --- Executes on button press in exportResults.
 function exportResults_Callback(hObject, eventdata, handles)
+    global images
+
+    % Package data into a cell array of structs
+    data = packageData(images);
+
+    % Plot on side window
+    plotData(data, handles)
+
+    % Export to Csv
+    exportToCsv(data)
+
+    % Send to plotly
+    sendToPlotly(data)
 
 
 % --- Executes on button press in loadNextBuffer.
@@ -390,6 +409,7 @@ function bufferImages(inds)
     imageBuffer = [];
     for i = 1:length(inds)
         imageBuffer = [imageBuffer, bufferedImage(images(inds(i)))];
+        imageBuffer(i).dataObj.bufferPos = i;
     end
 
     disp(imageBuffer)
@@ -452,17 +472,29 @@ function overlayOnMain(overlay, handles)
 
 
 %% Image Processing Functions
-function imBuff = analyzeImages(imBuff)
-    % Wrapper function to allow for parallelization 
-    parfor i = 1:length(imBuff)
-        [imBuff(i).labIm, imBuff(i).dataObj.neurons] = findNeurons(imBuff(i).im);
-        imBuff(i).dataObj.totalNeuronCount = estimateTotalNeuronsFromDapi(imBuff(i).im);
+function analyzeImagesInBuffer
+    global imageBuffer
+
+    % Create some containers, to allow for parallelization
+    labIms = cell(size(imageBuffer));
+    neurons = labIms;
+    totalNeuronCounts = zeros(size(imageBuffer));
+
+    % Analyze buffered images
+    parfor i = 1:length(imageBuffer)
+        [labIms{i}, neurons{i}] = findNeurons(imageBuffer(i).im);
+        totalNeuronCounts(i) = estimateTotalNeuronsFromDapi(imageBuffer(i).im);
     end
-    
-    for i = 1:length(imBuff)
-        totalNeurons = imBuff(i).dataObj.totalNeuronCount;
-        disp(['totalNeuronCount: ', num2str(totalNeurons)])
-        disp(['% expressing neurons: ', num2str(imBuff(i).dataObj.neurons.Count/totalNeurons)])
+
+    for i = 1:length(imageBuffer)
+        % Store values in data objects
+        imageBuffer(i).labIm = labIms{i};
+        imageBuffer(i).dataObj.neurons = neurons{i};
+        imageBuffer(i).dataObj.totalNeuronCount = totalNeuronCounts(i);
+
+        % Spit out some values
+        disp(['totalNeuronCount: ', num2str(imageBuffer(i).dataObj.totalNeuronCount)])
+        disp(['% expressing neurons: ', num2str(imageBuffer(i).dataObj.percentNeuronsExpressing())])
         disp('------------------------------------')
     end
 
@@ -488,27 +520,28 @@ function manipulateNeuronLabels(handles)
     inpt = getInputFromMainDisplay(handles);
 
     % Process input
-    processMainDisplayInput(imageBuffer(currImInd), inpt);
+    processMainDisplayInput(inpt);
 
     % Refresh Main Display
     refreshMainDisplay(handles);
 
 
-function processMainDisplayInput(imBuffer, in)
+function processMainDisplayInput(in)
     %% Calls removeNeurons and addNeurons accordingly
     % "input.buttonPress"
     coordsToAdd = in.bp == 1;
     coordsToRemove = in.bp ==3;
 
     % Add and remove neurons
-    addNeurons(imBuffer, in.xInds(coordsToAdd), in.yInds(coordsToAdd));
-    removeNeurons(imBuffer, in.xInds(coordsToRemove), in.yInds(coordsToRemove));
+    addNeurons(in.xInds(coordsToAdd), in.yInds(coordsToAdd));
+    removeNeurons(in.xInds(coordsToRemove), in.yInds(coordsToRemove));
 
 
-function addNeurons(imBuffer, xInds, yInds)
+function addNeurons(xInds, yInds)
+    global imageBuffer currImInd
     %% Adds neurons to imageBuffer.neurons and .labIm
     nRad = 15; % TODO: Make this user defined
-    [X, Y] = meshgrid(1:size(imBuffer.labIm, 2), 1:size(imBuffer.labIm, 1));
+    [X, Y] = meshgrid(1:size(imageBuffer(currImInd).labIm, 2), 1:size(imageBuffer(currImInd).labIm, 1));
 
     for i = 1:length(xInds)
         x = xInds(i);
@@ -518,28 +551,29 @@ function addNeurons(imBuffer, xInds, yInds)
         newNeuron.Centroid = [x, y];
         newNeuron.BoundingBox = [[x, y] - nRad, nRad*2, nRad*2];
 
-        nKey = max(imBuffer.labIm(:)) + 1;
-        imBuffer.dataObj.neurons(nKey) = newNeuron;
+        nKey = max(imageBuffer(currImInd).labIm(:)) + 1;
+        imageBuffer(currImInd).dataObj.neurons(nKey) = newNeuron;
 
         % draw a circle on labIm
         circleInds = nRad^2 >= (X - x).^2 + (Y - y).^2;
-        imBuffer.labIm(circleInds) = nKey;
+        imageBuffer(currImInd).labIm(circleInds) = nKey;
     end
 
 
-function removeNeurons(imBuffer, xInds, yInds)
-    %% Removes neurons from imBuffer.dataObj.neurons and .labIm
+function removeNeurons(xInds, yInds)
+    global imageBuffer currImInd
+    %% Removes neurons from imageBuffer.dataObj.neurons and .labIm
     for i = 1:length(xInds)
         nr = yInds(i);
         nc = xInds(i);
 
         % nr, nc
-        nKey = imBuffer.labIm(nr, nc);
+        nKey = imageBuffer(currImInd).labIm(nr, nc);
         
         % remove key, update labIm
-        if imBuffer.dataObj.neurons.isKey(nKey)
-            imBuffer.dataObj.neurons.remove(nKey);
-            imBuffer.labIm(imBuffer.labIm == nKey) = 0;
+        if imageBuffer(currImInd).dataObj.neurons.isKey(nKey)
+            imageBuffer(currImInd).dataObj.neurons.remove(nKey);
+            imageBuffer(currImInd).labIm(imageBuffer(currImInd).labIm == nKey) = 0;
         end
     end
 
@@ -551,3 +585,15 @@ function inpt = getInputFromMainDisplay(handles)
     inpt.xInds = round(xInds);
     inpt.yInds = round(yInds);
     inpt.bp = buttonPresses;
+
+
+function sendToPlotly(data)
+    plotlyLogin;
+    response = plotly(data)
+
+
+function exportToCsv(data)
+    
+
+
+function plotData(data, h)

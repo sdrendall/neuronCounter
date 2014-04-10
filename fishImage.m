@@ -10,8 +10,9 @@ classdef fishImage < handle
         isdir
         datenum
         neurons = containers.Map('KeyType', 'double', 'ValueType', 'any');
-        totalNeuronCount
+        totalNeuronCount = 0;
         data
+        bufferPos = 0;
     end
 
     methods
@@ -27,5 +28,10 @@ classdef fishImage < handle
             [obj.containingDirPath, ~, obj.filetype] = fileparts(obj.path);
             [~, obj.containingDirName] = fileparts(obj.containingDirPath);
         end
+
+        function percentExpressing = percentNeuronsExpressing(self)
+            percentExpressing = double(self.neurons.Count)/self.totalNeuronCount * 100;
+        end
+
     end
 end

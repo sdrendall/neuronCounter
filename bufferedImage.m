@@ -1,10 +1,10 @@
 classdef bufferedImage < handle 
     properties (SetAccess = private)
         im
-        dataObj
     end
     properties
         labIm
+        dataObj
     end
 
     methods
