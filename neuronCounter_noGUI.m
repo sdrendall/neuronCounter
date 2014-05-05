@@ -33,7 +33,7 @@ function neuronCounter_noGUI(startPath)
         totalNeuronCounts = zeros(size(imageBuffer));
     
         % Analyze buffered images
-        parfor i = 1:length(imageBuffer)
+        for i = 1:length(imageBuffer)
             [labIms{i}, neurons{i}] = findNeurons(imageBuffer(i).im);
             totalNeuronCounts(i) = estimateTotalNeuronsFromDapi(imageBuffer(i).im);
         end
