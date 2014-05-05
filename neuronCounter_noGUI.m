@@ -1,9 +1,13 @@
-function neuronCounter_noGUI
+function neuronCounter_noGUI(startPath)
 %% Script to analyze a set of FISH images without using the GUI
 % Ideally this can be run on Orchestra
 
+    if ~exist('startPath', 'var')
+        startPath = uigetdir()
+    end
+
     %% Find Images
-    images = searchForFISHImages()
+    images = searchForFISHImages(startPath)
     % Create a randomized vector of inds so that images
     bufferInds = randperm(length(images));
 
