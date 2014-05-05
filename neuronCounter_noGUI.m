@@ -13,7 +13,7 @@ function neuronCounter_noGUI(startPath)
 
     % Load Images
     imageBuffer = [];
-    for i = 1:length(bufferInds)
+    parfor i = 1:length(bufferInds)
         imageBuffer = [imageBuffer, bufferedImage(images(bufferInds(i)))];
         imageBuffer(i).dataObj.bufferPos = i;
     end
@@ -49,3 +49,5 @@ function neuronCounter_noGUI(startPath)
             disp(['% expressing neurons: ', num2str(imageBuffer(i).dataObj.percentNeuronsExpressing())])
             disp('------------------------------------')
         end
+    end
+end
