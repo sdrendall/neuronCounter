@@ -51,3 +51,9 @@ function analyzeImagesInBuffer
         disp('------------------------------------')
     end
     
+    
+function neuronCount = estimateTotalNeuronsFromDapi(im)
+    dapi = im(:,:,3);
+    bw = im2bw(dapi, graythresh(dapi));
+    % estimate number of nuclei based on avg number of pixels in a nucleus
+    neuronCount = sum(bw(:))/(100*pi);
