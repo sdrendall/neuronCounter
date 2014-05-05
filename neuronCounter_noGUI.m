@@ -14,7 +14,7 @@ function neuronCounter_noGUI(startPath)
     % Load Images
     global imageBuffer
     imageBuffer = [];
-    parfor i = 1:length(bufferInds)
+    for i = 1:length(bufferInds)
         imageBuffer = [imageBuffer, bufferedImage(images(bufferInds(i)))];
         imageBuffer(i).dataObj.bufferPos = i;
     end
