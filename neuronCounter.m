@@ -102,7 +102,7 @@ function loadImages_Callback(hObject, eventdata, handles)
     global images bufferInds
 
     % Load images -- Function is recursive by default
-    images = searchForFISHImages();
+    images = searchForFISHImages()
     
     % Create a random permutation of the indexes to each image to use for buffering
     bufferInds = randperm(length(images));
@@ -594,6 +594,5 @@ function sendToPlotly(data)
 
 function exportToCsv(data)
     
-
-
+    
 function plotData(data, h)

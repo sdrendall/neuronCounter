@@ -8,14 +8,14 @@ function [labIm, neuronProps] = findNeurons(im)
 
 
     % Extract green layer
-    green = double(im(:,:,2));
+    green = mat2gray(im(:,:,2));
 
     % Log -- probably a better way to accentuate image
-    logIm = mat2gray(log2(green));
+    %logIm = log2(green);
 
     % segment -- should reveal section
-    filtIm = imfilter(logIm, fspecial('disk', 10));
-    section = im2bw(filtIm, graythresh(filtIm));
+    filtIm = imfilter(green, fspecial('disk', 10), 'replicate');
+    section = im2bw(filtIm, graythresh(green));
 
     % segment -- for cells (or a big mess if no cells are present)
     cells = im2bw(filtIm, graythresh(filtIm(section)));

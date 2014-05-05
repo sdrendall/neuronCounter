@@ -22,6 +22,7 @@ classdef fishImage < handle
             for i = 1:length(fileFields)
                 setfield(obj, fileFields{i}, getfield(file, fileFields{i}));
             end
+            obj
 
             % Get path and filetype
             obj.path = fullfile(containingDirPath, file.name);
