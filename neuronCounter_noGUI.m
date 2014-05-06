@@ -35,14 +35,15 @@ function analyzeImagesInBuffer
         totalNeuronCounts(i) = estimateTotalNeuronsFromDapi(imageBuffer(i).im);
 
         % Store values in data objects
-        imageBuffer(i).labIm = labIms{i};
         imageBuffer(i).dataObj.neurons = neurons{i};
         imageBuffer(i).dataObj.totalNeuronCount = totalNeuronCounts(i);
 
         % Save analysis        
         bufferPath = fullfile('~', 'bufferedImages')
         ensureDir(bufferPath)
-        save(fullfile(bufferPath, imageBuffer(i).name), imageBuffer(i))
+        [~, baseName] = fileparts(imageBuffer(i).dataObj.name)
+        save(fullfile(bufferPath, baseName), imageBuffer(i).dataObj)
+        imwrite(labIms{i}, fullfile(bufferPath, [baseName, '_mask.tif']))
     end
     
 
