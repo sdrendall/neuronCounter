@@ -42,7 +42,7 @@ function analyzeImagesInBuffer
         % Save analysis        
         bufferPath = fullfile('~', 'bufferedImages')
         ensureDir(bufferPath)
-        saveBuffer(fullfile(bufferPath, imageBuffer(i).name), imageBuffer(i))
+        save(fullfile(bufferPath, imageBuffer(i).name), imageBuffer(i))
     end
     
 
