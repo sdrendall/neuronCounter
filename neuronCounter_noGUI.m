@@ -22,10 +22,6 @@ function neuronCounter_noGUI(startPath)
     % Find Neurons
     analyzeImagesInBuffer()
 
-    % Save to .mat file
-    save('~/analyzedImages', 'imageBuffer')
-
-
 function analyzeImagesInBuffer
     global imageBuffer
     % Create some containers, to allow for parallelization
@@ -37,21 +33,24 @@ function analyzeImagesInBuffer
     for i = 1:length(imageBuffer)
         [labIms{i}, neurons{i}] = findNeurons(imageBuffer(i).im);
         totalNeuronCounts(i) = estimateTotalNeuronsFromDapi(imageBuffer(i).im);
-    end
 
-    for i = 1:length(imageBuffer)
         % Store values in data objects
         imageBuffer(i).labIm = labIms{i};
         imageBuffer(i).dataObj.neurons = neurons{i};
         imageBuffer(i).dataObj.totalNeuronCount = totalNeuronCounts(i);
 
-        % Spit out some values
-        disp(['totalNeuronCount: ', num2str(imageBuffer(i).dataObj.totalNeuronCount)])
-        disp(['% expressing neurons: ', num2str(imageBuffer(i).dataObj.percentNeuronsExpressing())])
-        disp('------------------------------------')
+        % Save analysis        
+        bufferPath = fullfile(startPath, 'bufferedImages')
+        ensureDir(bufferPath)
+        saveBuffer(fullfile(bufferPath, imageBuffer(i).name), imageBuffer(i))
     end
     
-    
+
+function ensureDir(dirPath)
+    if ~exist(dirPath, 'dir')
+        mkdir(dirPath)
+    end
+
 function neuronCount = estimateTotalNeuronsFromDapi(im)
     dapi = im(:,:,3);
     bw = im2bw(dapi, graythresh(dapi));
