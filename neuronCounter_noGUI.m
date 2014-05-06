@@ -40,7 +40,7 @@ function analyzeImagesInBuffer
         imageBuffer(i).dataObj.totalNeuronCount = totalNeuronCounts(i);
 
         % Save analysis        
-        bufferPath = fullfile(startPath, 'bufferedImages')
+        bufferPath = fullfile('~', 'bufferedImages')
         ensureDir(bufferPath)
         saveBuffer(fullfile(bufferPath, imageBuffer(i).name), imageBuffer(i))
     end
