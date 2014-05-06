@@ -42,7 +42,8 @@ function analyzeImagesInBuffer
         bufferPath = fullfile('~', 'bufferedImages')
         ensureDir(bufferPath)
         [~, baseName] = fileparts(imageBuffer(i).dataObj.name)
-        save(fullfile(bufferPath, baseName), imageBuffer(i).dataObj)
+        tempToSave = imageBuffer(i).dataObj;
+        save(fullfile(bufferPath, baseName), 'tempToSave')
         imwrite(labIms{i}, fullfile(bufferPath, [baseName, '_mask.tif']))
     end
     
